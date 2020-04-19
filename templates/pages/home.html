@@ -4,8 +4,43 @@
 {% block title %}Home page{% endblock title %}
 
 {% block content %}
-<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <img src="{% static 'images/logo.png' %}" class="img-fluid" alt="DjangoX logo"/>
-  <p class="lead">A Django starter project with batteries.</p>
-</div>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+  crossorigin=""
+/>
+<script
+  src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+  integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+  crossorigin=""
+></script>
+
+<div id="mapid"></div>
+<style>
+  #mapid { height: 400px; }
+</style>
+{{ events|json_script:"events" }}
+<script>
+  let mymap = L.map('mapid').setView([40.8, -73.9], 11);
+
+  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: `Map data &copy;
+      <a href="https://www.openstreetmap.org/">OpenStreetMap</a>
+      contributors,
+      <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
+      Imagery © <a href="https://www.mapbox.com/">Mapbox</a>`,
+    maxZoom: 18,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: '<you mapbox token here>'
+  }).addTo(mymap);
+
+  let events = JSON.parse(document.getElementById('events').textContent);
+  for (let event of events) {
+    L.marker([event.latitude, event.longitude]).addTo(mymap);
+  }
+</script>
+
 {% endblock content %}
